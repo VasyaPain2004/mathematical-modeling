@@ -26,8 +26,8 @@ ds2 = Measure('ds', domain=mesh2, subdomain_data=boundaries2)
 dx3 = Measure('dx', domain=mesh3, subdomain_data=subdomains3)
 ds3 = Measure('ds', domain=mesh3, subdomain_data=boundaries3)
 
-T_max = 100
-N = 10
+T_max = 6
+N = 50
 tau = T_max / N
 dt = 0
       
@@ -73,6 +73,9 @@ file1 = File("/mnt/c/Users/Vasya/Downloads/temperature1.pvd")
 file2 = File("/mnt/c/Users/Vasya/Downloads/temperature2.pvd")
 file3 = File("/mnt/c/Users/Vasya/Downloads/temperature3.pvd")
 
+error_file1 = open("/mnt/c/Users/Vasya/Downloads/error_data1.dat", "w")
+error_file2 = open("/mnt/c/Users/Vasya/Downloads/error_data2.dat", "w")
+
 while dt < T_max:
   dt += tau
   solve(a1 == L1, T1, bcs1)
@@ -84,13 +87,23 @@ while dt < T_max:
   file1 << T1
   file2 << T2
   file3 << T3
+  
+  T1_on_V3 = interpolate(T1, V3)
+  E2_t_1 = inner(T3 - T1_on_V3, T3 - T1_on_V3)*dx3
+  E2_b_1 = inner(T3, T3)*dx3
+  E2_1 = sqrt(abs(assemble(E2_t_1))/abs(assemble(E2_b_1)))
+  
+  T2_on_V3 = interpolate(T2, V3)
+  E2_t_2 = inner(T3 - T2_on_V3, T3 - T2_on_V3)*dx3
+  E2_b_2 = inner(T3, T3)*dx3
+  E2_2 = sqrt(abs(assemble(E2_t_2))/abs(assemble(E2_b_2)))
+  
+  error_file1.write(f"{dt} {E2_1}\n")
+  error_file2.write(f"{dt} {E2_2}\n")
+  
   T0_1.assign(T1)
   T0_2.assign(T2)
   T0_3.assign(T3)
-  
-T1_on_V3 = interpolate(T1, V3)
-E2_t = inner(T3 - T1_on_V3, T3 - T1_on_V3)*dx3
-E2_b = inner(T3, T3)*dx3
-E2 = sqrt(abs(assemble(E2_t))/abs(assemble(E2_b)))
 
-print("Error =", str(E2))
+error_file1.close()
+error_file2.close()
