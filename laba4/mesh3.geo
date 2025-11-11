@@ -21,20 +21,23 @@ Line(11) = {6, 1};
 Point(12) = {5, 5, 0, p}; // Center
 Point(13) = {7, 5, 0, p};  // Right point
 Point(14) = {3, 5, 0, p};  // Left point
-Point(15) = {5, 3.5, 0, p}; // Bottom point
+Point(15) = {5, 3, 0, p}; // Bottom point
 Point(16) = {7, 5, 0, p}; 
-
-Ellipse(17) = {13, 12, 16, 15}; // правая нижняя четверть
-Ellipse(18) = {15, 12, 16, 14}; // левая нижняя четверть
-
-Line Loop(1) = {7, 8, -18, -17, 9, 10, 11};
-
+//+
+Circle(12) = {15, 12, 3};
+//+
+Circle(13) = {15, 12, 4};
+//+
+Curve Loop(1) = {7, 8, -12, 13, 9, 10, 11};
+//+
 Plane Surface(1) = {1};
-
+//+
+Physical Curve(1) = {7};
+//+
+Physical Curve(2) = {11};
+//+
+Physical Curve(3) = {10};
+//+
+Physical Curve(4) = {9, 13, 12, 8};
+//+
 Physical Surface(1) = {1};
-
-Physical Line(1) = {7}; // левая граница
-Physical Line(2) = {8, 9}; // верхняя граница
-Physical Line(3) = {10}; // правая граница
-Physical Line(4) = {11}; // нижняя граница
-Physical Line(5) = {17, 18}; // эллиптический вырез
