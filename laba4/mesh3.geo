@@ -18,10 +18,10 @@ Line(9) = {4, 5};
 Line(10) = {5, 6};
 Line(11) = {6, 1};
 
-Point(12) = {5, 5, 0, p}; // Center
-Point(13) = {7, 5, 0, p};  // Right point
-Point(14) = {3, 5, 0, p};  // Left point
-Point(15) = {5, 3, 0, p}; // Bottom point
+Point(12) = {5, 5, 0, p}; 
+Point(13) = {7, 5, 0, p};  
+Point(14) = {3, 5, 0, p}; 
+Point(15) = {5, 3, 0, p};
 Point(16) = {7, 5, 0, p}; 
 //+
 Circle(12) = {15, 12, 3};
