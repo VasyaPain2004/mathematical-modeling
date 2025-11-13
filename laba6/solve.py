@@ -1,32 +1,19 @@
 from dolfin import *
 
-meshname = "mesh"
+meshname = "mesh3"
 mesh = Mesh(meshname + ".xml")
 subdomains = MeshFunction("size_t", mesh, meshname + "_physical_region.xml")
 boundaries = MeshFunction("size_t", mesh, meshname + "_facet_region.xml")
-
-class HeterExpression(UserExpression):
-  def setvalues(self, u1, u2):
-    self.u1 = u1
-    self.u2 = u2
-  def eval_cell(self, value, x, ufc_cell):
-    if subdomains[ufc_cell.index] == 1:
-      value[0] = self.u1
-    else:
-      value[0] = self.u2
       
-k = HeterExpression(degree = 0)
-k.setvalues(200.0, 10.0)
-mu = HeterExpression(degree = 0)
-mu.setvalues(0.8e9, 0.5e9)
-lmbda = HeterExpression(degree = 0)
-lmbda.setvalues(1.25e9, 0.65e9)
+k = Constant(200.0)
+mu = Constant(0.8e9)
+lmbda = Constant(1.25e9)
 beta = 1.0e-5*(3*lmbda + 2*mu)
 C = 1.0e6
 alpAir = 100.0
-TAir = 10.0
-THot = 150.0
-tmax = 10
+TAir = 1.0
+THot = 1000.0
+tmax = 10000
 dt = tmax/10
 
 def epsilon(u):
@@ -50,16 +37,16 @@ bc2 = DirichletBC(W.sub(0).sub(0), g0, boundaries, 2)
 bc3 = DirichletBC(W.sub(0).sub(1), g0, boundaries, 3)
 bcT1 = DirichletBC(W.sub(1), THot, boundaries, 1)
 bcT3 = DirichletBC(W.sub(1), TAir, boundaries, 3)
-bcs = [bc2, bc3, bcT1, bcT3]
+bcT4 = DirichletBC(W.sub(1), THot, boundaries, 4)
+bcs = [bc2, bc3, bcT1, bcT3, bcT4]
 u, T = TrialFunctions(W)
 v, q = TestFunctions(W)
 dx = Measure('dx', domain=mesh, subdomain_data=subdomains)
 ds = Measure('ds', domain=mesh, subdomain_data=boundaries)
-
 a = inner(sigma(u), epsilon(v))*dx + beta*inner(grad(T), v)*dx \
-+ dt*beta*Tn_val*div(u)*q*dx + dt*C*T*q*dx \
-+ inner(k*grad(T), grad(q))*dx + alpAir*T*ds(4)
-L = dt*C*Tn*q*dx + dt*beta*Tn_val*div(un)*q*dx + alpAir*TAir*ds(4) + beta*inner(grad(Tn_val), v)*dx
++ beta*Tn_val*div(u)*q*dx + C*T*q*dx \
++ dt*inner(k*grad(T), grad(q))*dx
+L = C*Tn*q*dx + beta*Tn_val*div(un)*q*dx
 
 w.rename('u', '0')
 fileu = File("/mnt/c/Users/Vasya/Downloads/u.pvd")
@@ -74,4 +61,4 @@ while t < tmax:
   Tn.assign(TT)
   print('w(%g, %g)' % (w.vector().min(), w.vector().max()))
   fileu << uu
-  fileT << TT 
+  fileT << TT
