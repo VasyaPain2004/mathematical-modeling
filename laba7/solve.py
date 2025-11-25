@@ -48,7 +48,7 @@ file = File("/mnt/c/Users/Vasya/Downloads/T1.pvd")
 start_time = time.time()
 t = tau
 
-solver = KrylovSolver('cg', 'sor') 
+solver = KrylovSolver('richardson', 'amg') 
 cg_prm = solver.parameters
 cg_prm["absolute_tolerance"] = 1E-7 
 cg_prm["relative_tolerance"] = 1E-4 
