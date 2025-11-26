@@ -20,6 +20,4 @@ Plane Surface(1) = {1};
 Physical Surface(1) = {1};
 
 Physical Line(1) = {1};
-Physical Line(2) = {2};
-Physical Line(3) = {3};
-Physical Line(4) = {4};
+Physical Line(2) = {3};
