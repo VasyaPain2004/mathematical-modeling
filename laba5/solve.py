@@ -19,14 +19,13 @@ mu = 1
 rho = 1
 nu = mu / rho
 U_inf = 10.0
-T_max = 2
-dt = T_max / 256
+T_max = 0.5
+dt = T_max / 36
 
 inflow = DirichletBC(V, (U_inf, 0), boundaries, 1)
-# outflow = DirichletBC(V, (U_inf, 0), boundaries, 2)
-# outflow_p = DirichletBC(Q, Constant(10), boundaries, 2)
+outflow_p = DirichletBC(Q, Constant(0.0), boundaries, 2)
 bcu = [inflow]
-bcp = []
+bcp = [outflow_p]
 
 u0 = Function(V)
 u1 = Function(V)
@@ -63,18 +62,15 @@ pfile = File("/mnt/c/Users/Vasya/Downloads/pressure.pvd")
 t = dt
 while t < T_max + DOLFIN_EPS:
 
-    # Compute tentative velocity step
     b1 = assemble(L1)
     [bc.apply(A1, b1) for bc in bcu]
     solve(A1, u1.vector(), b1, "bicgstab", "default")
 
-    # Pressure correction
     b2 = assemble(L2)
-    # [bc.apply(A2, b2) for bc in bcp]
-    # [bc.apply(p1.vector()) for bc in bcp]
+    [bc.apply(A2, b2) for bc in bcp]
+    [bc.apply(p1.vector()) for bc in bcp]
     solve(A2, p1.vector(), b2, "bicgstab", prec)
 
-    # Velocity correction
     b3 = assemble(L3)
     [bc.apply(A3, b3) for bc in bcu]
     solve(A3, u1.vector(), b3, "bicgstab", "default")
@@ -85,3 +81,4 @@ while t < T_max + DOLFIN_EPS:
     u0.assign(u1)
     t += dt
     print(t)
+
